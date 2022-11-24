@@ -18,8 +18,6 @@ macro sum_IBM_steny(A) esc(:(sum($A[$ix,(:)]))) end
 macro sum_IBM_stenx(A,idx) esc(:(sum($A[$idx[($ix+1)]]))) end
 
 
-
-
 @parallel function compute_timesteps!(dτVx::Data.Array, dτVy::Data.Array, dτPt::Data.Array, Mus::Data.Array, Vsc::Data.Number, Ptsc::Data.Number, min_dxy2::Data.Number, max_nxy::Int)
     @all(dτVx) = Vsc*min_dxy2/@av_xi(Mus)/4.1
     @all(dτVy) = Vsc*min_dxy2/@av_yi(Mus)/4.1
@@ -346,9 +344,10 @@ end
     Rogy      =  Data.Array(Rogy)
 
     # Preparation of visualisation
-    ENV["GKSwstype"]="nul"; if isdir("viz2D_out")==false mkdir("viz2D_out") end; loadpath = "./viz2D_out/"; anim = Animation(loadpath,String[]); errorp = Animation(loadpath,String[])
-
-    println("Animation directory: $(anim.dir)")
+    ENV["GKSwstype"]="nul"; if isdir("viz2D_out")==false mkdir("viz2D_out") end; 
+    loadpath = "./viz2D_out/"; numericalp = Animation(loadpath,String[]); 
+    errorp = Animation(loadpath,String[]); analyticalp = Animation(loadpath,String[]); 
+    
     X, Y    = -lx/2:dx:lx/2, -ly/2:dy:ly/2
     Xv, Yv  = (-lx/2-dx/2):dx:(lx/2+dx/2), (-ly/2-dy/2):dy:(ly/2+dy/2)
     X2, Y2  = Array(X)*ones(1,size(X,1)), ones(size(Y,1),1)*Array(Y)'
@@ -487,14 +486,14 @@ end
     p10 = heatmap(X,Y,Array(Pt-Pa)',aspect_ratio=1,xlims=(X[1],X[end]),ylims=(Y[1],Y[end]),c=:inferno,title="P-Pa")
     
     # display(plot(p1, p2, p4, p5))
-    plot(p1, p2, p3, p4); frame(errorp)
-    gif(errorp, "Stokes2D_inclusion_numerical.gif", fps = 15)
-    plot(p5, p6, p7); frame(errorp)
-    gif(errorp, "Stokes2D_inclusion_analytical.gif", fps = 15)
+    plot(p1, p2, p3, p4); frame(numericalp)
+    gif(numericalp, "Stokes2D_numerical.gif", fps = 1)
+    plot(p5, p6, p7); frame(analyticalp)
+    gif(analyticalp, "Stokes2D_analytical.gif", fps = 1)
     plot(p8, p9, p10); frame(errorp)
-    gif(errorp, "Stokes2D_inclusion_err.gif", fps = 15)
-    norm2_vx, norm2_vy, norm2_p = sqrt(sum((Vxa.-Vxin).^2*dx*dy)), sqrt(sum((Vya.-Vyin).^2*dx*dy)), sqrt(sum((Pa.-Pt).^2*dx*dy))
-    # save data
+    gif(errorp, "Stokes2D_err.gif", fps = 1)
+    norm2_vx, norm2_vy, norm2_p = sqrt(sum((Vxa.-Vxin).^2*dx*dy)), sqrt(sum((Vya.-Vyin).^2*dx*dy)), sqrt(sum((Pa.-Pt).^2)*dx*dy)
+   # save data
     fid=h5open(filepath*filename,"w")
     fid["Vxin"] = Vxin
     fid["Vyin"] = Vyin
