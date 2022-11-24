@@ -467,6 +467,9 @@ end
     @printf("Total steps = %d, err = %2.3e, time = %1.3e min (@ T_eff = %1.2f GB/s) \n", niter, err, wtime/60, round(T_eff, sigdigits=2))
 
     # Visualisation
+    Vxin[R.<=rc] .= NaN
+    Vyin[R.<=rc] .= NaN
+    Pt[R.<=rc] .= NaN     
     p1 = heatmap(X, Y, Array(Pt)', aspect_ratio=1, xlims=(X[1],X[end]), ylims=(Y[1],Y[end]), c=:inferno, title="Pressure, numerical")
     p2 = heatmap(Xv, Y, Array(Vx)', aspect_ratio=1, xlims=(Xv[1],Xv[end]), ylims=(Y[1],Y[end]), c=:inferno, title="Vx, numerical")
     p3 = heatmap(X, Yv, Array(Vy)', aspect_ratio=1, xlims=(X[1],X[end]), ylims=(Yv[1],Yv[end]), c=:inferno, title="Vy, numerical")
@@ -484,10 +487,10 @@ end
     p10 = heatmap(X,Y,Array(Pt-Pa)',aspect_ratio=1,xlims=(X[1],X[end]),ylims=(Y[1],Y[end]),c=:inferno,title="P-Pa")
     
     # display(plot(p1, p2, p4, p5))
-    plot(p1, p2, p3, p4); frame(anim)
-    gif(anim, "Stokes2D_inclusion_numerical.gif", fps = 15)
-    plot(p5, p6, p7); frame(anim)
-    gif(anim, "Stokes2D_inclusion_analytical.gif", fps = 15)
+    plot(p1, p2, p3, p4); frame(errorp)
+    gif(errorp, "Stokes2D_inclusion_numerical.gif", fps = 15)
+    plot(p5, p6, p7); frame(errorp)
+    gif(errorp, "Stokes2D_inclusion_analytical.gif", fps = 15)
     plot(p8, p9, p10); frame(errorp)
     gif(errorp, "Stokes2D_inclusion_err.gif", fps = 15)
     norm2_vx, norm2_vy, norm2_p = sqrt(sum((Vxa.-Vxin).^2*dx*dy)), sqrt(sum((Vya.-Vyin).^2*dx*dy)), sqrt(sum((Pa.-Pt).^2*dx*dy))
