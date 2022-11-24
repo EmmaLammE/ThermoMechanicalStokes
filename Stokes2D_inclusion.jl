@@ -49,7 +49,6 @@ end
 end
 
 @parallel function compute_V!(Vx::Data.Array, Vy::Data.Array, dVxdτ::Data.Array, dVydτ::Data.Array, dτVx::Data.Array, dτVy::Data.Array)
-    @inn(Vx) = @inn(Vx) + @all(dτVx)*@all(dVxdτ)
     @inn(Vy) = @inn(Vy) + @all(dτVy)*@all(dVydτ)
     return
 end
@@ -297,7 +296,7 @@ end
     Ptsc      = 1.0/4.0     # relaxation paramter for the pressure equation pseudo-timestep limiter
     ε         = 1e-6        # nonlinear absolute tolerence
     ε_rel     = 1e-10
-    nx, ny    = 64, 64    # numerical grid resolution; should be a mulitple of 32-1 for optimal GPU perf
+    nx, ny    = 63, 63    # numerical grid resolution; should be a mulitple of 32-1 for optimal GPU perf
     # Derived numerics
     dx, dy    = lx/(nx-1), ly/(ny-1) # cell sizes
     min_dxy2  = min(dx,dy)^2
@@ -333,8 +332,8 @@ end
     IBM_lambda  = 1
     IBM_bumpNum = lx/IBM_lambda
     IBM_s       = 0
-    ud,vd	    = 0,0
-    phi2	    = 1.0 
+    ud,vd	= 0,0
+    phi2	= 1.0 
     rc	        =lx/10
     ###########################
     # Initial conditions
@@ -342,9 +341,9 @@ end
     Rogx      =  ρgi*sind(alpha)*ones(nx,ny)
     Rogy      =  ρgi*cosd(alpha)*ones(nx,ny)
     Mus       =  μsi*ones(nx,ny)
-    Mus       = Data.Array(Mus)
-    Rogx      = Data.Array(Rogx)
-    Rogy      = Data.Array(Rogy)
+    Mus       =  Data.Array(Mus)
+    Rogx      =  Data.Array(Rogx)
+    Rogy      =  Data.Array(Rogy)
 
     # Preparation of visualisation
     ENV["GKSwstype"]="nul"; if isdir("viz2D_out")==false mkdir("viz2D_out") end; loadpath = "./viz2D_out/"; anim = Animation(loadpath,String[]); errorp = Animation(loadpath,String[])
@@ -486,22 +485,22 @@ end
     
     # display(plot(p1, p2, p4, p5))
     plot(p1, p2, p3, p4); frame(anim)
-    gif(anim, "Stokes2D_numerical.gif", fps = 15)
+    gif(anim, "Stokes2D_inclusion_numerical.gif", fps = 15)
     plot(p5, p6, p7); frame(anim)
-    gif(anim, "Stokes2D_analytical.gif", fps = 15)
+    gif(anim, "Stokes2D_inclusion_analytical.gif", fps = 15)
     plot(p8, p9, p10); frame(errorp)
-    gif(errorp, "Stokes2D_err.gif", fps = 15)
-    norm2_vx, norm2_vy, norm2_p = sqrt(sum((Vxa.-Vxin).^2*dx*dy)), sqrt(sum((Vya.-Vyin).^2*dx*dy)), sqrt(sum((Pa.-Pt).^2)*dx*dy)
+    gif(errorp, "Stokes2D_inclusion_err.gif", fps = 15)
+    norm2_vx, norm2_vy, norm2_p = sqrt(sum((Vxa.-Vxin).^2*dx*dy)), sqrt(sum((Vya.-Vyin).^2*dx*dy)), sqrt(sum((Pa.-Pt).^2*dx*dy))
     # save data
     fid=h5open(filepath*filename,"w")
-    fid["Vxin"]=Vxin
-    fid["Vyin"]=Vyin
-    fid["Pt"]=Pt
-    fid["Vya"]=Vya
-    fid["Vxa"]=Vxa
-    fid["Pa"]=Pa
-    fid["X"]=X2
-    fid["Y"]=Y2
+    fid["Vxin"] = Vxin
+    fid["Vyin"] = Vyin
+    fid["Pt"  ] = Pt
+    fid["Vya" ] = Vya
+    fid["Vxa" ] = Vxa
+    fid["Pa"  ] = Pa
+    fid["X"   ] = X2
+    fid["Y"   ] = Y2
     close(fid)
 
     print("\n ERROR relative to analytical soln:\n  Vx:", norm2_vx,", Vy:",norm2_vy,", P:",norm2_p,"\n")
