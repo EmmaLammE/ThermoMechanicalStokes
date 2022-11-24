@@ -297,7 +297,7 @@ end
     Ptsc      = 1.0         # relaxation paramter for the pressure equation pseudo-timestep limiter
     ε         = 1e-6        # nonlinear absolute tolerence
     ε_rel     = 1e-10
-    nx, ny    = 64, 64    # numerical grid resolution; should be a mulitple of 32-1 for optimal GPU perf
+    nx, ny    = 63, 63    # numerical grid resolution; should be a mulitple of 32-1 for optimal GPU perf
     # Derived numerics
     dx, dy    = lx/(nx-1), ly/(ny-1) # cell sizes
     min_dxy2  = min(dx,dy)^2
@@ -325,13 +325,8 @@ end
 
     ########### IBM  ##########
     # ~~ parameters
-    IBM_mu      = lx*2/6
-    IBM_sigma   = 1e2
-    IBM_amp     = 1
     IBM_sten    = Int(4)
     IBM_us      = 0
-    IBM_lambda  = 1
-    IBM_bumpNum = lx/IBM_lambda
     IBM_s       = 0
     ud,vd	    = 0,0
     phi2	    = 1.0 
